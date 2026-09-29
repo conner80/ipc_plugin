@@ -1,0 +1,840 @@
+package ipc_plugin // import "github.com/conner80/ipc_plugin"
+
+Package: ipc_plugin Description: Common functions, types and constants Author:
+John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's error structure Author: John Doe
+Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's errors Author: John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's host preprocessor Author: John Doe
+Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's preprocessor structure Author:
+John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's information item Author: John Doe
+Version: 1.0.0
+
+Package: ipc_plugin Description: Plugins manager Author: John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Exchange protocol and constants Author:
+John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's default transport structure Author:
+John Doe Version: 1.0.0
+
+Package: ipc_plugin Description: Plugin's transport interface Author: John Doe
+Version: 1.0.0
+
+Package: ipc_plugin Description: Package version file Author: John Doe Version:
+1.0.0
+
+CONSTANTS
+
+const Version = "v1.0.0"
+    Version is the current IPC plugin version.
+
+
+VARIABLES
+
+var (
+	// Incorrect method name format error
+	ErrMethodNameFormat = NewError(FormatError, "method name format error")
+	// Incorrect method name length
+	ErrMethodNameLength = NewError(FormatError, "incorrect method's name length")
+	// Incorrect message type error
+	ErrIncorrectMessageType = NewError(FormatError, "incorrect message type")
+	// Incorrect message command
+	ErrIncorrectMessageCommand = NewError(FormatError, "incorrect message command")
+	// Incorrect error type
+	ErrIncorrectErrorType = NewError(FormatError, "incorrect error type")
+	// Plugin's access key format error
+	ErrAccessKeyFormatError = NewError(FormatError, "plugin's access key format error")
+	// Incorrect access key - access denied
+	ErrIncorrectAccessKey = NewError(HandlerError, "incorrect access key")
+	// Plugin's description length error
+	ErrPluginDescriptionLengthError = NewError(FormatError, "plugin's description length error")
+	// Message is empty (NIL)
+	ErrMessageEmpty = NewError(PluginPanicError, "message is NIL")
+	// Incorrect error response - no error object in the message
+	ErrIncorrectErrorResponse = NewError(FormatError, "incorrect error response")
+	// Plugin's description format error
+	ErrPluginDescriptionError = NewError(FormatError, "plugin's description format error")
+	// Create new plugin's socket error
+	ErrPluginCreateSocketError = NewError(PluginPanicError, "can't create socket")
+	// User's method not found error
+	ErrPluginMethodNotFound = NewError(FormatError, "user's method not found")
+	// Plugin's command format error
+	ErrCommandFormatError = NewError(FormatError, "plugin's command format error")
+	// User's method handler is not specified
+	ErrNoHandler = NewError(PluginPanicError, "user's method handler is NIL")
+	// Specified user's method name already registered
+	ErrMethodAllreadyRegistered = NewError(PluginPanicError, "user's method name already registered")
+	// Receive answer from specified plugin error
+	ErrReceiveError = NewError(TransportError, "receive answer error")
+	// Response format error
+	ErrAnswerFormatError = NewError(FormatError, "answer/response format error")
+	// Plugin's name/key is incorrect
+	ErrPluginKeyIncorrect = NewError(FormatError, "plugin's name is incorrect")
+	// Plugin with this key is already registered
+	ErrPluginKeyAllreadyExists = NewError(FormatError, "plugin with this key is already registered")
+	// Plugin executable file doesn't exists
+	ErrPluginFileNotFound = NewError(PluginPanicError, "plugin's executable file is not found")
+	// Plugin is stopped error
+	ErrPluginStopped = NewError(PluginPanicError, "specified plugin is stopped")
+	// Plugin with specified key already registered
+	ErrPluginAllreadyRegistered = NewError(PluginPanicError, "plugin with specified key already registered")
+	// Plugin doesn't support mandatory methods
+	ErrPluginNotSupportedMandatoryMethods = NewError(PluginPanicError, "plugin doesn't support mandatory methods")
+)
+
+FUNCTIONS
+
+func GetDefaultSocketDir() string
+    GetDefaultSocketDir returns directory for UNIX-sockets
+
+        Returns:
+
+    * UNIX-socket default directory
+
+func IsProcessExists(pid int) (bool, error)
+    IsProcessExists checks existance the process by PID
+
+        Parameters:
+
+    * pid [in] - PID of a process
+
+        Returns:
+
+    * TRUE - process is running at the moment, otherwise FALSE
+
+    * Check operation error or nil if success
+
+func KillProcess(pid int) error
+    KillProcess kill/stop specified process by PID
+
+        Parameters:
+
+    * pid [in] - PID of a process
+
+        Returns:
+
+    * Kill process operation error or nil if success
+
+func NewHost(socket_path string, conn_timeout, send_timeout, recv_timeout time.Duration, no_check_param bool) (*Host, *Error)
+    NewHost creates new plugin's host object
+
+        Parameters:
+
+    * socket_path [in] - Full filename for UNIX-socket file. If empty - set
+    default UNIX path for the file.
+
+    * conn_timeout [in] - Plugin connection timeout
+
+    * send_timeout [in] - Send request to plugin timeout
+
+    * recv_timeout [in] - Receive response from plugin timeout
+
+        Returns:
+
+    * Pointer to the created plugin's host object
+
+    * Plugin's error
+
+func NewPlugin(socket_path string, access_key string, description string) (*Plugin, *Error)
+    NewPlugin creates new plugin's object and start internal listener for accept
+    commands from host
+
+        Parameters:
+
+    * socket_path [in] - Full filename for UNIX-socket file. If empty - set
+    default UNIX path for the file.
+
+    * description [in] - Plugin's description
+
+        Returns:
+
+    * Pointer to the created plugin's command preprocessor
+
+    * Plugin's error
+
+func NewPluginInfo(key, access_key, path, socket_path string, connection_to, read_to, write_to time.Duration) (*PluginInfo, *Error)
+    NewPluginInfo creates new plugin's host
+
+        Parameters:
+
+    * key [in] - Plugin's unique key/name
+
+    * path [in] - Plugin's executable full filename
+
+    * socket_path [in] - Plugin's UNIX-socket filename
+
+    * connection_ti [in] - Plugin's connection timeout
+
+    * read_to [in] - Read/Receive data from plugin timeout
+
+    * write_to [in] - Write/Send data to plugin timeout
+
+        Returns:
+
+    * Reference to the plugin's information
+
+    * Plugin's error or nil if success
+
+
+TYPES
+
+type CommandsList []string
+    CommandsList the list of supported commands of the plugin
+
+type Error struct {
+	// Type plugin error's type
+	Type ErrorType
+	// ErrorText error text message
+	ErrorText string
+}
+    Error plugin's error structure
+
+func GetDefaultSocketPath() (string, *Error)
+    GetDefaultSocketPath get UNIX-socket default filepath for the most UNIX-like
+    OS.
+
+        Returns:
+
+    * UNIX-socket filename
+
+    * Plugin's error or nil if success
+
+func IsValidMethodName(name string) *Error
+    IsValidMethodName validate user's method name
+
+        Parameters:
+
+    * name [in] - Method name
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+func NewError(err_type ErrorType, err_text string) *Error
+    NewError create new error
+
+        Description:
+
+    Create new plugin's error and returns pointer to the created error object.
+
+        Parameters:
+
+    * err_type [in] - Plugin's error type
+
+    * err_text [in] - Plugin's error text message
+
+        Returns:
+
+    * Pointer to the created plugin's error
+
+func (e *Error) Error() string
+    Error get error text string
+
+func (e *Error) Is(target error) bool
+    Is compare error
+
+type ErrorType uint8
+    ErrorType plugin's error type
+
+const (
+	// PluginPanicError critical plugin error
+	PluginPanicError ErrorType = iota
+	// HandlerError plugin's method handler internal error (not PANIC)
+	HandlerError
+	// FormatError request or response format error
+	FormatError
+	// TransportError exhange between host and plugin error
+	TransportError
+)
+func (e ErrorType) IsValid() bool
+    IsValid validate error type
+
+type Host struct {
+	// SocketPath socket's filepath
+	//
+	//	example:
+	//
+	// /var/run/plugin.sock
+	SocketPath string
+	// ConnectionTimeout plugin connection timeout
+	ConnectionTimeout time.Duration
+	// SendTimeout send request to plugin timeout
+	SendTimeout time.Duration
+	// RecvTimeout receive response from plugin timeout
+	RecvTimeout time.Duration
+	// Has unexported fields.
+}
+    Host plugin's host preprocessor
+
+        Description:
+
+    The client-side part of the plugin (the plugin host) that ensures the sends
+    of commands to the plugin core. The entire operation mechanism is built
+    around IPC technology based on the UNIX-sockets.
+
+func (h *Host) Call(method_name string, req_param interface{}, resp_result interface{}) *Error
+    Call perform specified method
+
+        Parameters:
+
+    * method_name [in] - Plugin's method name
+
+    * req_param [in] - Request parameter for method
+
+    * resp_result [inout] - Response result
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+func (h *Host) GetDescription() (string, *Error)
+    GetDescription returns plugin's description text
+
+        Returns:
+
+    * Plugin's description text
+
+    * Plugin's error or nil if success
+
+func (h *Host) GetList() (CommandsList, *Error)
+    GetList returns supported methods list by specified plugin
+
+        Returns:
+
+    * Supported methods names list
+
+    * Plugin's error or nil if success
+
+func (h *Host) GetPid() (int, *Error)
+    GetPid returns plugin's process PID
+
+        Returns:
+
+    * Plugin's process PID
+
+    * Plugin's error or nil if success
+
+func (h *Host) Kill(access_key string) (int, *Error)
+    Kill graceful shutdown specified plugin
+
+        Parameters:
+
+    * access_key [in] - Secret access key for perform KILL command
+
+        Returns:
+
+    * Plugin's application process PID
+
+    * Plugin's error or nil if success
+
+func (h *Host) Ping() *Error
+    Ping check plugin exists and alive
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+type ITransport interface {
+	// Send sends message to specified data channel
+	//
+	//	Parameters:
+	//
+	// * writer [inout] - Streaming writer with specified writing data channel
+	//
+	// * msg [in] - Message for transfer
+	//
+	//	Returns:
+	//
+	// * Transfered bytes count
+	//
+	// * Plugin's error or nil if success
+	Send(writer io.Writer, msg *ProtocolMessage) (n int, err *Error)
+	// Recv receive message from specified data channel
+	//
+	//	Parameters:
+	//
+	// * reader [in] - Streaming reader with specified reading data channel
+	//
+	// * msg [inout] - Message for transfer
+	//
+	//	Returns:
+	//
+	// * Transfered bytes count
+	//
+	// * Plugin's error or nil if success
+	Recv(reader io.Reader, msg *ProtocolMessage) (n int, err *Error)
+}
+    ITransport plugin's transport interface
+
+func NewTransport() ITransport
+    NewTransport creates new transport object
+
+        Returns:
+
+    * Created transport interface
+
+type MessageType uint8
+    MessageType the type of message
+
+const (
+	// RequestType request message type
+	RequestType MessageType = iota
+	// ResponseSuccessType response success message type
+	ResponseSuccessType
+	// ResponseErrorType response error message type
+	ResponseErrorType
+)
+func (t MessageType) IsValid() bool
+    IsValid validate plugin's message type
+
+func (t MessageType) String() string
+    String get plugin's message type as string
+
+type Plugin struct {
+	// SocketPath socket's filepath
+	//
+	//	example:
+	//
+	// /var/run/plugin.sock
+	SocketPath string
+	// Description plugin's information/description
+	//
+	//	Warning:
+	//
+	// Maximum length 5000 characters
+	Description string
+	// AccessKey the secret key for performing KILL command
+	AccessKey string
+
+	// Has unexported fields.
+}
+    Plugin plugin's preprocessor structure
+
+        Description:
+
+    The server-side part of the plugin (the plugin core) that ensures the
+    execution of commands from the host. The entire operation mechanism is built
+    around IPC technology based on the UNIX-sockets.
+
+func (p *Plugin) Done()
+    Done finalization plugin object and reset all methods to zero
+
+func (p *Plugin) Use(method_name string, handler PluginHanlder) *Error
+    Use register new user's method and handler
+
+        Description:
+
+    Register new user's method and handler. Rules for method name like and
+    identifier name.
+
+        Parameter:
+
+    * method_name [in] - The name of the user's plugin method
+
+    * handler [in] - Pointer to the method's handler function
+
+        Returns:
+
+    * Plugin error or nil if success
+
+type PluginCommand uint8
+    PluginCommand plugin's main command
+
+const (
+	// PingCommand PING command for plugin
+	PingCommand PluginCommand = iota
+	// PidCommand get plugin's executable process PID
+	PidCommand
+	// ListCommand the list of supported user's methods names
+	ListCommand
+	// InfoCommand get plugin's information
+	InfoCommand
+	// Shutdown plugin process
+	KillCommand
+	// UserCommand execute specified user's command
+	UserCommand
+)
+func (c PluginCommand) IsValid() bool
+    IsValid validate plugin's command
+
+func (c PluginCommand) String() string
+    String get plugin's command as string
+
+type PluginHanlder func(*ProtocolMessage, *ProtocolMessage) error
+    PluginHanlder plugin's user handler preprocessor
+
+        Parameters:
+
+    * req [in] - Request message to plugin
+
+    * resp [inout] - Response message from plugin
+
+        Returns:
+
+    * Internal user's handler error
+
+type PluginInfo struct {
+	// Has unexported fields.
+}
+    PluginInfo plugin's the main information
+
+func (p *PluginInfo) Call(method_name string, req interface{}, resp interface{}) *Error
+    Call call user-defined specified method
+
+        Parameters:
+
+    * method_name [in] - User-defined method name
+
+    * req [in] - Method request parameter
+
+    * resp [inout] - Method response
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+func (p *PluginInfo) CheckRunning()
+    CheckRunning check alive plugin status and update it
+
+func (p *PluginInfo) Description() string
+    Description returns plugin's description text
+
+        Returns:
+
+    * Plugin's description text
+
+func (p *PluginInfo) IsAlive() bool
+    IsAlive plugin live status
+
+        Returns:
+
+    * TRUE - plugin is alive, otherwise FALSE
+
+func (p *PluginInfo) LastError() *Error
+    LastError returns plugin's critical last error
+
+        Returns:
+
+    * Plugin's critical last error
+
+func (p *PluginInfo) List() CommandsList
+    List returns plugin's supported methos list
+
+        Returns:
+
+    * Supported methods list
+
+func (p *PluginInfo) PID() int
+    PID returns plugin's application PID
+
+        Returns:
+
+    * Plugin's application PID
+
+func (p *PluginInfo) Run() *Error
+    Run start the plugin
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+func (p *PluginInfo) Stop() *Error
+    Stop stops plugin and kill plugin's process
+
+type PluginManager struct {
+	// Has unexported fields.
+}
+    PluginManager Plugins manager
+
+func NewPluginManager(socket_directory string, methods CommandsList) *PluginManager
+    NewPluginManager creates new plugin manager
+
+        Parameters:
+
+    * socket_directory [in] - plugin's UNIX-sockets default directory
+
+        Returns:
+
+    * Reference to the created plugin manager
+
+func (p *PluginManager) Done()
+    Done finalization plugins manager and stop all goroutines
+
+func (p *PluginManager) GetPlugin(key string) *PluginInfo
+    GetPlugin Returns reference to specified plugin by plugin's key
+
+        Parameters:
+
+    * key [in] - Plugin's specified unique key
+
+        Returns:
+
+    * Reference to the plugin controller or nil if not found
+
+func (p *PluginManager) LoadPlugin(key, access_key, filename string, connect_to, read_to, write_to time.Duration) *Error
+    LoadPlugin loads specified plugin file and checks supported methods by
+    plugin
+
+func (p *PluginManager) UnloadPlugin(key string)
+    UnloadPlugin unloads specified plugin by plugin's key
+
+        Parameters:
+
+    * key [in] - Plugin's key
+
+type ProtocolMessage struct {
+	// Type message type
+	//
+	// - 0 (RequestType) - Request message
+	//
+	// - 1 (ResponseSuccessType) - Response success message with neccessary answer data
+	//
+	// - 2 (ResponseErrorType) - Response error message with error type and text
+	Type MessageType
+	// Command plugin's command
+	//
+	// - 0 (PingCommand) - Ping command to the plugin's application and check alive status
+	//
+	// - 1 (PidCommand) - Request plugin's PID
+	//
+	// - 2 (ListCommand) - Request plugin's methods list
+	//
+	// - 3 (InfoCommand) - Request plugin description
+	//
+	// - 4 (KillCommand) - Graceful shutdown plugin process
+	//
+	// - 5 (UserCommand) - Send user command
+	Command PluginCommand
+	// Method user's command method name
+	//
+	//	Description:
+	// The same principles apply to the naming of methods as to identifiers (variables) in programming languages;
+	// the length of the name must be in the range from 1 to 255 characters.
+	Method string
+	// Error error for error response
+	Error *Error
+	// PID plugin's PID
+	PID int
+	// Description plugin's description
+	Description string
+	// List Supported methods list
+	List CommandsList
+	// AccessKey plugin's access key for performing KILL command
+	AccessKey string
+	// Data user's data
+	Data json.RawMessage
+}
+    ProtocolMessage a message between the Host and the Plugin containing
+    commands and data.
+
+    # Exchange protocol
+
+        Header:
+
+    All commands (request and response) have protocol's header.
+
+        Offset | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0000  | 1      | Message type: Request or Response
+        0x0001  | 1      | Command's type: Ping, List or User
+        0x0002  | Dyn    | Body (optional)
+
+        Body:
+
+    For error answers (for all commands) sends header and plugin's error message
+
+        Offset | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 1      | Plugin's error type
+        0x0003  | 1      | Error text length
+        0x0004  | 1-255  | Error text message
+
+        For other succeful commands body structrue below
+
+    # 1. PING command
+
+    Check plugin prensents (check IsAlive) command.
+
+        	Request:
+
+         * No body - only header
+
+        	Response:
+
+         * No body - only header
+
+    # 2. PID command
+
+    Request plugin's executable process PID.
+
+        	Request:
+
+        * No body - only header
+
+        	Response:
+
+        Offset  | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 4      | Plugin's executable process PID
+
+    # 3. LIST command
+
+    Request supported user's methods list.
+
+        	Request:
+
+        * No body - only header
+
+        	Response:
+
+        Offset  | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 4      | Method's list length in bytes
+        0x0006  | Dyn    | Message list
+
+    # 4. INFO command
+
+    Request plugin's information/description.
+
+        	Request:
+
+        * No body - only header.
+
+        	Response:
+
+        Offset  | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 4      | Information text length
+        0x0006  | 0-5000 | Information text
+
+    # 5. KILL command
+
+    Graceful shutdown plugin's process.
+
+        	Request:
+
+        Offset  | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 1      | Access key string
+        0x0003  | 1-255  | Access key string
+
+        	Response:
+
+        Offset  | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002  | 4      | Plugin's PID
+
+    # 6. USER command
+
+    Call specified user's method.
+
+        	Request:
+
+         Offset       | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002        | 4      | Message body length in bytes
+        0x0006        | 1      | Method name length in bytes
+        0x0007        | 1-255  | Method name
+        0x0008-0x0106 | Dyn    | User data block
+
+        	Response:
+
+         Offset       | Length | Description
+
+    ------------------------------------------------------------
+
+        0x0002        | 4      | Message body length in bytes
+        0x0006        | 1      | Method name length in bytes
+        0x0007        | 1-255  | Method name
+        0x0008-0x0106 | Dyn    | User data block
+
+func (m *ProtocolMessage) Clear()
+    Clear clear protocol message data
+
+func (m *ProtocolMessage) GetData(obj interface{}) *Error
+    GetData returns user's object from message data
+
+        Parameters:
+
+    * obj [out] - Pointer to the user's object variable
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+func (m *ProtocolMessage) SetData(obj interface{}) *Error
+    SetData sets user's data to the message
+
+        Parameters:
+
+    * obj [in] - User's object variable
+
+        Returns:
+
+    * Plugin's error orr nil if success
+
+func (m *ProtocolMessage) Validate() *Error
+    Validate checking the correctness of the message content.
+
+        Returns:
+
+    * Plugin's error or nil if success
+
+type StdTransport struct {
+}
+    StdTransport plugin's default transport structure
+
+func (t *StdTransport) Recv(reader io.Reader, msg *ProtocolMessage) (n int, err *Error)
+    Recv receive message from specified data channel
+
+        Parameters:
+
+    * reader [in] - Streaming reader with specified reading data channel
+
+    * msg [inout] - Message for transfer
+
+        Returns:
+
+    * Transfered bytes count
+
+    * Plugin's error or nil if success
+
+func (t *StdTransport) Send(writer io.Writer, msg *ProtocolMessage) (n int, err *Error)
+    Send sends message to specified data channel
+
+        Parameters:
+
+    * writer [inout] - Streaming writer with specified writing data channel
+
+    * msg [in] - Message for transfer
+
+        Returns:
+
+    * Transfered bytes count
+
+    * Plugin's error or nil if success
+
